@@ -1,0 +1,56 @@
+#include <HardwareSerial.h>
+
+#define RS485_DE 4 // Pin para controlar DE/RE
+#define ULTRASONIC_TRIGGER 5 // Trigger del sensor ultrasónico
+#define ULTRASONIC_ECHO 18 // Echo del sensor ultrasónico
+#define LDR_PIN 34 // Pin analógico de la fotorresistencia
+#define LED_PIN 2 // Pin del LED
+
+HardwareSerial RS485(1);
+
+void setup() {
+    pinMode(RS485_DE, OUTPUT);
+    digitalWrite(RS485_DE, LOW); // Inicialmente en modo recibir
+
+    pinMode(ULTRASONIC_TRIGGER, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
+    
+    Serial.begin(115200);
+    RS485.begin(115200, SERIAL_8N1, 16, 17); // RX, TX
+
+    Serial.println("Esclavo listo.");
+}
+
+void loop() {
+    if (RS485.available()) {
+        String command = RS485.readStringUntil('\n');
+
+        if (command == "LED_ON") {
+            digitalWrite(LED_PIN, HIGH);
+            Serial.println("LED encendido");
+        } else if (command == "LED_OFF") {
+            digitalWrite(LED_PIN, LOW);
+            Serial.println("LED apagado");
+        }
+    }
+
+    // Medir distancia con el sensor ultrasónico
+    long duration;
+    digitalWrite(ULTRASONIC_TRIGGER, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(ULTRASONIC_TRIGGER, LOW);
+    
+    duration = pulseIn(ULTRASONIC_ECHO, HIGH);
+    float distance = (duration * 0.034) / 2; // Calcular distancia en cm
+
+    int ldrValue = analogRead(LDR_PIN); // Leer valor de la fotorresistencia
+
+    String data = "Ultrasonido: " + String(distance) + " cm; LDR: " + String(ldrValue) + "\n";
+    
+    digitalWrite(RS485_DE, HIGH); // Modo enviar
+    RS485.print(data);
+    delay(10);
+    digitalWrite(RS485_DE, LOW); // Modo recibir
+
+    delay(1000); // Esperar antes de la próxima lectura
+}
