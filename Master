@@ -1,0 +1,44 @@
+#include <HardwareSerial.h>
+
+#define RS485_DE 4 // Pin para controlar DE/RE
+#define BUTTON_ON 12 // Pulsador para encender el LED
+#define BUTTON_OFF 13 // Pulsador para apagar el LED
+
+HardwareSerial RS485(1);
+
+void setup() {
+    pinMode(RS485_DE, OUTPUT);
+    digitalWrite(RS485_DE, LOW); // Inicialmente en modo recibir
+
+    pinMode(BUTTON_ON, INPUT_PULLUP);
+    pinMode(BUTTON_OFF, INPUT_PULLUP);
+
+    Serial.begin(115200);
+    RS485.begin(115200, SERIAL_8N1, 16, 17); // RX, TX
+
+    Serial.println("Maestro listo.");
+}
+
+void loop() {
+    if (digitalRead(BUTTON_ON) == LOW) {
+        digitalWrite(RS485_DE, HIGH); // Modo enviar
+        RS485.write("LED_ON");
+        delay(10);
+        digitalWrite(RS485_DE, LOW); // Modo recibir
+        delay(100); // Espera para evitar rebotes
+    }
+
+    if (digitalRead(BUTTON_OFF) == LOW) {
+        digitalWrite(RS485_DE, HIGH); // Modo enviar
+        RS485.write("LED_OFF");
+        delay(10);
+        digitalWrite(RS485_DE, LOW); // Modo recibir
+        delay(100); // Espera para evitar rebotes
+    }
+
+    if (RS485.available()) {
+        String data = RS485.readStringUntil('\n');
+        Serial.print("Datos del esclavo: ");
+        Serial.println(data);
+    }
+}
