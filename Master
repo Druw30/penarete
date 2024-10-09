@@ -23,7 +23,7 @@ void loop() {
     if (digitalRead(BUTTON_ON) == LOW) {
         digitalWrite(RS485_DE, HIGH); // Modo enviar
         RS485.write("LED_ON");
-        delay(10);
+        delay(100);
         digitalWrite(RS485_DE, LOW); // Modo recibir
         delay(100); // Espera para evitar rebotes
     }
@@ -31,7 +31,7 @@ void loop() {
     if (digitalRead(BUTTON_OFF) == LOW) {
         digitalWrite(RS485_DE, HIGH); // Modo enviar
         RS485.write("LED_OFF");
-        delay(10);
+        delay(100);
         digitalWrite(RS485_DE, LOW); // Modo recibir
         delay(100); // Espera para evitar rebotes
     }
