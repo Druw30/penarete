@@ -27,11 +27,11 @@ void loop() {
     if (RS485.available()) {
         String command = RS485.readStringUntil('\n');
 
-        if (command == "LED_ON") {
+        if (command == "V") {
             digitalWrite(LED_PIN, HIGH);
             Serial.println("LED encendido");
             delay(100);
-        } else if (command == "LED_OFF") {
+        } else if (command == "R") {
             digitalWrite(LED_PIN, LOW);
             Serial.println("LED apagado");
             delay(100);
